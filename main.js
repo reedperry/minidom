@@ -6,15 +6,14 @@ const doc = window.document;
  * Class for building elements and mounting them in the document
  */
 class DOM {
-
   /**
-   * Mount an element under a target element
-   * @param target The target element to mount an element to
+   * Mount an element as a child of target element
    * @param el The element to mount
-   * @param replace If true, replace the content of target with el. Otherwise,
-   * append el to the existing content of target
+   * @param [target] The target element to mount an element to. Defaults. to document.body
+   * @param [replace] If true, replace the content of target with el. Otherwise,
+   * append el to the existing content of target. Defaults to false.
    */
-  static mount(target, el, replace) {
+  static mount(el, target = document.body, replace = false) {
     if (replace) {
       target.innerHTML = '';
     }
@@ -92,10 +91,22 @@ class DOM {
   static builder(elem) {
     return {
       render: () => elem,
+      click: this.click.bind(this, elem),
+      on: this.on.bind(this, elem),
       withAttrs: this.withAttrs.bind(this, elem),
       withStyle: this.withStyle.bind(this, elem),
       withText: this.withText.bind(this, elem)
     };
+  }
+
+  static click(elem, cb) {
+    elem.addEventListener('click', cb);
+    return this.builder(elem);
+  }
+
+  static on(elem, event, cb) {
+    elem.addEventListener(event, cb);
+    return this.builder(elem);
   }
 
   static withAttrs(elem, attrs) {
@@ -113,6 +124,7 @@ class DOM {
     return this.builder(elem);
   }
 }
+
 const blue = {
   background: 'navy'
 };
@@ -120,7 +132,7 @@ const green = {
   background: 'darkgreen'
 };
 const red = {
-  background: 'maroon'
+  background: 'darkred'
 };
 const yellow = {
   background: 'yellow'
@@ -170,19 +182,43 @@ const linkStyle = {
 };
 
 const links = ['Home', 'About', 'Archive'].map(function(text) {
-  let linkContainer = DOM.build('div.link').withStyle(linkStyle).render();
+  const linkContainer = DOM.build('div.link').withStyle(linkStyle).render();
   DOM.mount(
-    linkContainer,
-    DOM.build('a').withText(text).withAttrs(attrs).render()
+    DOM.build('a').withText(text).withAttrs(attrs).render(),
+    linkContainer
   );
   return linkContainer;
 });
 
 links.forEach(function(link) {
-  DOM.mount(header, link);
+  DOM.mount(link, header);
 });
 
-DOM.mount(app, header);
+DOM.mount(header, app);
+
+const spaced = {
+  margin: '5px'
+};
+
+const container = DOM.render('div#container');
+const colors = [blue, green, red, yellow, gray];
+for (let i = 0; i < 5; i++) {
+  const box = DOM.build('div')
+    .withStyle(colors[i])
+    .withStyle(square)
+    .withStyle(spaced)
+    .on('mouseenter', function() {
+      this.style.opacity = 0.3;
+    })
+    .on('mouseleave', function() {
+      this.style.opacity = 1;
+    })
+    .render();
+
+  DOM.mount(box, container);
+}
+
+DOM.mount(container, app);
 
 // const els = []
 // for (let i = 0; i < 40; i++) {
@@ -197,7 +233,7 @@ DOM.mount(app, header);
 // }
 // els.forEach(el => app.appendChild(el))
 
-DOM.mount(document.body, app);
+DOM.mount(app);
 
 // const styles = [red, blue, green, yellow, gray]
 
