@@ -20,8 +20,8 @@ class DOM {
     target.appendChild(el);
   }
 
-  static render(tagName, attrs) {
-    const elem = this.build(tagName).render();
+  static render(elemStr, attrs) {
+    const elem = DOM.build(elemStr).render();
     if (attrs) {
       for (let attr in attrs) {
         elem.setAttribute(attr, attrs[attr]);
@@ -30,54 +30,52 @@ class DOM {
     return elem;
   }
 
-  static build(tagName) {
-    let id, classes = [], dividers = [], targets = ['#', '.'];
-
-    let idx = 0;
-    for (let char of tagName) {
-      if (targets.indexOf(char) > -1) {
-        dividers.push(idx);
-      }
-      idx++;
+  static parse(elemStr) {
+    if (!elemStr.length) {
+      throw new Error('Invalid element string: Empty input');
     }
 
-    dividers.sort((a, b) => a - b);
+    let parts = elemStr.split(/([#\.][_a-zA-Z0-9-]+)/).filter(p => !!p);
+    // console.log('raw parts:', parts);
 
-    for (let [idx, d] of dividers.entries()) {
-      let symbol = tagName[d];
-      if (DOM.isClass(symbol)) {
-        if (dividers.length > idx + 1) {
-          classes.push(tagName.substring(d + 1, dividers[idx + 1]));
-        } else {
-          classes.push(tagName.substring(d + 1));
-        }
-      } else if (DOM.isId(symbol)) {
-        if (dividers.length > idx + 1) {
-          id = tagName.substring(d + 1, dividers[idx + 1]);
-        } else {
-          id = tagName.substring(d + 1);
-        }
-      }
+    if (parts[0].match(/[a-zA-Z]/).index !== 0) {
+      throw new Error('Invalid element string: Must start with tag name');
     }
 
-    // Determine actual plain tag name
-    if (dividers.length) {
-      tagName = tagName.substring(0, dividers[0]);
+    const tagName = parts.shift().match(/[a-zA-Z]+/)[0];
+    let id = parts.find(p => p.startsWith('#'));
+    if (id) {
+      id = id.substring(1);
     }
+    const classes = parts
+      .filter(p => p.startsWith('.') && p.substring(1).match(/[_a-zA-Z0-9-]/))
+      .map(p => p.substring(1));
 
-    let elem = doc.createElement(tagName);
+    return {
+      tagName,
+      classes,
+      id
+    };
+  }
 
-    if (classes.length) {
-      for (let c of classes) {
+  static construct(elemDef) {
+    let elem = doc.createElement(elemDef.tagName);
+
+    if (elemDef.classes.length) {
+      for (let c of elemDef.classes) {
         elem.classList.add(c);
       }
     }
 
-    if (id) {
-      elem.id = id;
+    if (elemDef.id) {
+      elem.id = elemDef.id;
     }
 
-    return this.builder(elem);
+    return elem;
+  }
+
+  static build(elemStr) {
+    return DOM.builder(DOM.construct(DOM.parse(elemStr)));
   }
 
   static isClass(divider) {
@@ -91,37 +89,37 @@ class DOM {
   static builder(elem) {
     return {
       render: () => elem,
-      click: this.click.bind(this, elem),
-      on: this.on.bind(this, elem),
-      withAttrs: this.withAttrs.bind(this, elem),
-      withStyle: this.withStyle.bind(this, elem),
-      withText: this.withText.bind(this, elem)
+      click: DOM.click.bind(DOM, elem),
+      on: DOM.on.bind(DOM, elem),
+      withAttrs: DOM.withAttrs.bind(DOM, elem),
+      withStyle: DOM.withStyle.bind(DOM, elem),
+      withText: DOM.withText.bind(DOM, elem)
     };
   }
 
   static click(elem, cb) {
     elem.addEventListener('click', cb);
-    return this.builder(elem);
+    return DOM.builder(elem);
   }
 
   static on(elem, event, cb) {
     elem.addEventListener(event, cb);
-    return this.builder(elem);
+    return DOM.builder(elem);
   }
 
   static withAttrs(elem, attrs) {
     Object.assign(elem, attrs);
-    return this.builder(elem);
+    return DOM.builder(elem);
   }
 
   static withStyle(elem, style) {
     Object.assign(elem.style, style);
-    return this.builder(elem);
+    return DOM.builder(elem);
   }
 
   static withText(elem, text) {
     elem.textContent = text;
-    return this.builder(elem);
+    return DOM.builder(elem);
   }
 }
 
