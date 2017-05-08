@@ -31,12 +31,33 @@ class DOM {
   }
 
   static parse(elemStr) {
-    if (!elemStr.length) {
-      throw new Error('Invalid element string: Empty input');
+    if (!elemStr) {
+      throw new Error('Invalid element string: Empty/missing');
+    }
+
+    let elements = elemStr.split('>');
+    if (elements.length > 1) {
+      // Future...
+      for (const e of elements) {
+        if (e.includes('+')) {
+          console.log('sibling elements:', e.split('+'));
+        }
+      }
+
+      return elements.reduceRight((children, str, i) => {
+        return [DOM.parseSingle(str, children)];
+      }, []);
+    }
+
+    return DOM.parseSingle(elemStr);
+  }
+
+  static parseSingle(elemStr, children = []) {
+    if (!elemStr) {
+      throw new Error('Invalid element string: Empty/missing');
     }
 
     let parts = elemStr.split(/([#\.][_a-zA-Z0-9-]+)/).filter(p => !!p);
-    // console.log('raw parts:', parts);
 
     if (parts[0].match(/[a-zA-Z]/).index !== 0) {
       throw new Error('Invalid element string: Must start with tag name');
@@ -52,13 +73,19 @@ class DOM {
       .map(p => p.substring(1));
 
     return {
-      tagName,
+      children,
       classes,
-      id
+      id,
+      tagName
     };
   }
 
   static construct(elemDef) {
+    // Not supported yet...
+    if (Array.isArray(elemDef)) {
+      return DOM.construct(elemDef[0]);
+    }
+
     let elem = doc.createElement(elemDef.tagName);
 
     if (elemDef.classes.length) {
@@ -69,6 +96,12 @@ class DOM {
 
     if (elemDef.id) {
       elem.id = elemDef.id;
+    }
+
+    if (elemDef.children) {
+      for (const child of elemDef.children) {
+        elem.appendChild(DOM.construct(child));
+      }
     }
 
     return elem;
