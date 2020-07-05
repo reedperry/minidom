@@ -1,27 +1,11 @@
 'use strict';
 
-const doc = window.document;
-
-/**
- * Class for building elements and mounting them in the document
- */
-class DOM {
-  /**
-   * Mount an element as a child of target element
-   * @param el The element to mount
-   * @param [target] The target element to mount an element to. Defaults. to document.body
-   * @param [replace] If true, replace the content of target with el. Otherwise,
-   * append el to the existing content of target. Defaults to false.
-   */
-  static mount(el, target = document.body, replace = false) {
-    if (replace) {
-      target.innerHTML = '';
-    }
-    target.appendChild(el);
-  }
+export class DOMBuilder {
+  // Maybe shouldn't be a static methods API?
+  doc = window.document;
 
   static render(elemStr, attrs) {
-    const elem = DOM.build(elemStr).render();
+    const elem = DOMBuilder.build(elemStr).render();
     if (attrs) {
       for (let attr in attrs) {
         elem.setAttribute(attr, attrs[attr]);
@@ -29,6 +13,75 @@ class DOM {
     }
     return elem;
   }
+
+
+  static construct(elemDef) {
+    // Not supported yet...
+    if (Array.isArray(elemDef)) {
+      return DOMBuilder.construct(elemDef[0]);
+    }
+
+    let elem = doc.createElement(elemDef.tagName);
+
+    if (elemDef.classes.length) {
+      for (let c of elemDef.classes) {
+        elem.classList.add(c);
+      }
+    }
+
+    if (elemDef.id) {
+      elem.id = elemDef.id;
+    }
+
+    if (elemDef.children) {
+      for (const child of elemDef.children) {
+        elem.appendChild(DOMBuilder.construct(child));
+      }
+    }
+
+    return elem;
+  }
+
+  static build(elemStr) {
+    return DOMBuilder.builder(DOMBuilder.construct(ElementParser.parse(elemStr)));
+  }
+}
+
+export class ElementMounter {
+  defaultTarget = document.body;
+
+  static setDefaultTarget(target) {
+    this.defaultTarget = target;
+  }
+
+  /**
+   * Replace the contents of a target element with a child element
+   * @param el The element to mount
+   * @param [target] The target element to mount an element to. Defaults to ElementMounter.defaultTarget.
+   */
+  static replace(el, target = this.defaultTarget) {
+    target.innerHTML = '';
+    this.append(el, target);
+  }
+
+  /**
+   * Append an element as a child of target element
+   * @param el The element to append
+   * @param [target] The target element to append the new element to. Defaults to ElementMounter.defaultTarget.
+   */
+  static append(el, target = this.defaultTarget) {
+    target.appendChild(el);
+  }
+
+}
+
+// Maybe?
+export function minidom(query) {
+  return new DOMBuilder(query);
+}
+
+// All private
+class ElementParser {
 
   static parse(elemStr) {
     if (!elemStr) {
@@ -80,37 +133,6 @@ class DOM {
     };
   }
 
-  static construct(elemDef) {
-    // Not supported yet...
-    if (Array.isArray(elemDef)) {
-      return DOM.construct(elemDef[0]);
-    }
-
-    let elem = doc.createElement(elemDef.tagName);
-
-    if (elemDef.classes.length) {
-      for (let c of elemDef.classes) {
-        elem.classList.add(c);
-      }
-    }
-
-    if (elemDef.id) {
-      elem.id = elemDef.id;
-    }
-
-    if (elemDef.children) {
-      for (const child of elemDef.children) {
-        elem.appendChild(DOM.construct(child));
-      }
-    }
-
-    return elem;
-  }
-
-  static build(elemStr) {
-    return DOM.builder(DOM.construct(DOM.parse(elemStr)));
-  }
-
   static isClass(divider) {
     return divider === '.';
   }
@@ -119,6 +141,14 @@ class DOM {
     return divider === '#';
   }
 
+}
+
+/**
+ * Class for building elements and mounting them in the document
+ */
+class DOM {
+
+  // Does this stuff all move to Builder?
   static builder(elem) {
     return {
       render: () => elem,
