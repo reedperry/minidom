@@ -1,5 +1,6 @@
 
 const elementSplit = /(?:\s|>)/;
+const roughAttributeMatch = /(\[.*\])/;
 const attributeMatch = /(\[.+=".+"\])/;
 
 // TODO Handling for children/siblings/grouping
@@ -52,12 +53,13 @@ module.exports = class MiniDOMParser {
 
     const attributes = [];
     for (const part of parts) {
-      if (part.match(attributeMatch) && this.isValidAttribute(part)) {
-        attributes.push(part);
+      if (part.match(roughAttributeMatch)) {
+        const attribute = this.parseAttribute(part);
+        if (attribute) {
+          attributes.push(attribute);
+        }
       }
     }
-
-    console.log(attributes);
 
     const tagName = parts.shift().match(/[a-zA-Z]+/)[0];
     let id = parts.find(p => p.startsWith('#'));
@@ -77,15 +79,33 @@ module.exports = class MiniDOMParser {
     };
   }
 
-  static isValidAttribute(attrString) {
+  static parseAttribute(attrString) {
     if (!attrString) {
-      return false;
+      return null;
     }
-    const parts = attrString.split('=');
-    if (parts.length !== 2) {
-      return false;
+
+    if (!attrString.match(attributeMatch)) {
+      return null;
     }
-    return true;
+
+    const strippedAttrString = attrString.substring(1, attrString.length - 1);
+
+    const [name, rawValue] = strippedAttrString.split('=');
+    if (!name || !rawValue) {
+      return null;
+    }
+
+    const value = rawValue.substring(1, rawValue.length - 1);
+
+    console.log({
+      name,
+      value
+    });
+
+    return {
+      name,
+      value
+    };
   }
 
   static isClass(divider) {
