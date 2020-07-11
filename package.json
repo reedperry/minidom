@@ -1,0 +1,16 @@
+{
+  "name": "minidom",
+  "version": "0.1.0",
+  "description": "A simple library for creating and adding DOM elements to a page.",
+  "main": "index.js",
+  "repository": "https://github.com/reedperry/minidom.git",
+  "author": "Reed Perry <reedperry@users.noreply.github.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^26.1.0"
+  }
+}
