@@ -46,18 +46,91 @@ test('does not include invalid attributes in the output', () => {
   Parser.parseSingle('div[style="testing"][aria-label="some content"][role="alert"]["not"=valid].my-class#my-id')
 })
 
-// test('creates an element with one class', () => {
-//   expect(Parser.parse('a.my-class')).toEqual({
-//     tagName: 'a',
-//     classes: ['my-class'],
-//     id: undefined,
-//     children: []
-//   });
-// });
+test('creates an element with one class and an ID', () => {
+  expect(Parser.parse('a#main-link.my-class')).toEqual({
+    tagName: 'a',
+    classes: ['my-class'],
+    id: 'main-link',
+    attributes: [],
+    children: [],
+  })
+})
 
-// test('sandbox', () => {
-//   expect(Parser.parse('a.my-class>div span>p')).toEqual({});
-// });
+test('creates an element with one child', () => {
+  expect(Parser.parse('div>span')).toEqual({
+    tagName: 'div',
+    classes: [],
+    id: undefined,
+    attributes: [],
+    children: [
+      {
+        tagName: 'span',
+        classes: [],
+        id: undefined,
+        attributes: [],
+        children: [],
+      },
+    ],
+  })
+})
+
+test('creates an element with two children as siblings', () => {
+  expect(Parser.parse('div>span.child-one+span.child-two')).toEqual({
+    tagName: 'div',
+    classes: [],
+    id: undefined,
+    attributes: [],
+    children: [
+      {
+        tagName: 'span',
+        classes: ['child-one'],
+        id: undefined,
+        attributes: [],
+        children: [],
+      },
+      {
+        tagName: 'span',
+        classes: ['child-two'],
+        id: undefined,
+        attributes: [],
+        children: [],
+      },
+    ],
+  })
+})
+
+test('creates an element with a child, which has two siblings as children', () => {
+  expect(Parser.parse('div.grandparent>div.parent>div#my-div+span')).toEqual({
+    tagName: 'div',
+    classes: ['grandparent'],
+    id: undefined,
+    attributes: [],
+    children: [
+      {
+        tagName: 'div',
+        classes: ['parent'],
+        id: undefined,
+        attributes: [],
+        children: [
+          {
+            tagName: 'div',
+            classes: [],
+            id: 'my-div',
+            attributes: [],
+            children: [],
+          },
+          {
+            tagName: 'span',
+            classes: [],
+            id: undefined,
+            attributes: [],
+            children: [],
+          },
+        ],
+      },
+    ],
+  })
+})
 
 // test('basic sibling', () => {
 //   expect(Parser.parse('a.first+a.second')).toEqual({});

@@ -16,7 +16,9 @@ module.exports = class MiniDOMParser {
 
     let elements = elemStr.split(elementListSplit).map((el) => el.trim())
 
-    if (elements.length > 1) {
+    if (elements.length === 1) {
+      return this.parseSingle(elemStr)
+    } else if (elements.length > 1) {
       for (let i = 0; i < elements.length; i++) {
         if (elements[i].includes('+')) {
           elements[i] = elements[i].split('+')
@@ -25,11 +27,18 @@ module.exports = class MiniDOMParser {
 
       return elements.reduce((tree, currentElement) => {
         if (tree) {
+          // Find the deepest (by depth), and then furthest to the 'right' if there are siblings
+          let deepestElement = tree
+          while (deepestElement.children.length) {
+            deepestElement = deepestElement.children[deepestElement.children.length - 1]
+          }
+
           if (!Array.isArray(currentElement)) {
-            tree.children.push(this.parseSingle(currentElement))
+            deepestElement.children.push(this.parseSingle(currentElement))
           } else {
-            // FIXME Tree setup is really not implemented yet...
-            tree.children.push(this.parseSingle(currentElement[0]))
+            currentElement.forEach((childInSiblingGroup) =>
+              deepestElement.children.push(this.parseSingle(childInSiblingGroup))
+            )
           }
           return tree
         }
@@ -37,8 +46,6 @@ module.exports = class MiniDOMParser {
         return this.parseSingle(currentElement)
       }, null)
     }
-
-    return this.parseSingle(elemStr)
   }
 
   static parseSingle(input, children = []) {
@@ -50,7 +57,6 @@ module.exports = class MiniDOMParser {
 
     const tagName = parts[0] || null
     const tagNameMatch = !!tagName && tagName.match(validTagName)
-    console.log(tagNameMatch)
     if (!tagNameMatch || tagNameMatch.index !== 0) {
       // TODO Define elsewhere
       throw new Error('Invalid element string: Must start with tag name')
@@ -98,6 +104,7 @@ module.exports = class MiniDOMParser {
         }
       }
     }
+    return attributes
   }
 
   static parseAttribute(attrString) {
@@ -117,11 +124,6 @@ module.exports = class MiniDOMParser {
     }
 
     const value = rawValue.substring(1, rawValue.length - 1)
-
-    console.log({
-      name,
-      value,
-    })
 
     return {
       name,
