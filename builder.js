@@ -1,7 +1,5 @@
 
-// This may not stay a utility style/static methods class...
 module.exports = class MiniDOMBuilder {
-  doc = window.document;
 
   static render(elemStr, attrs) {
     const elem = this.build(elemStr).render();
@@ -13,11 +11,9 @@ module.exports = class MiniDOMBuilder {
     return elem;
   }
 
-
   static construct(elemDef) {
-    // Not supported yet...
     if (Array.isArray(elemDef)) {
-      return DOMBuilder.construct(elemDef[0]);
+      throw new Error('Not ready for this yet...');
     }
 
     let elem = doc.createElement(elemDef.tagName);
@@ -44,6 +40,11 @@ module.exports = class MiniDOMBuilder {
   static build(elemStr) {
     return this.builder(this.construct(MiniDOMParser.parse(elemStr)));
   }
+
+  static buildTree(elemDef) {
+
+  }
+
 
   static builder(elem) {
     return {

@@ -7,7 +7,6 @@ const attributeMatch = /^\[.+=(?:"|').+(?:"|')\]$/
 
 const isTruthy = (x) => !!x
 
-// TODO Handling for multiplying?
 module.exports = class MiniDOMParser {
   static parse(elemStr) {
     if (!elemStr) {
@@ -75,15 +74,6 @@ module.exports = class MiniDOMParser {
       .map((p) => p.substring(1))
 
     const attributes = this.parseAttributes(parts)
-
-    console.log('Input:', input)
-    console.table({
-      children,
-      classes,
-      attributes,
-      id,
-      tagName,
-    })
 
     return {
       children,
