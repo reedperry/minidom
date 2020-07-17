@@ -1,5 +1,4 @@
 const validTagName = /^[a-zA-Z]+(?:[-a-zA-Z][a-zA-Z]+)*$/
-const elementListSplit = /(?:\s|>)/
 const elementPartsSplit = /(\[.*?\])|([#\.][_a-zA-Z0-9-]+)/
 const classMatch = /^[_a-zA-Z0-9-]+$/
 const roughAttributeMatch = /(\[.*\])/
@@ -8,42 +7,42 @@ const attributeMatch = /^\[.+=(?:"|').+(?:"|')\]$/
 const isTruthy = (x) => !!x
 
 module.exports = class MiniDOMParser {
-  static parse(elemStr) {
-    if (!elemStr) {
+
+  static parse(elemStrArray) {
+    if (!Array.isArray(elemStrArray)) {
       throw new Error('Invalid element string: Empty/missing')
     }
 
-    let elements = elemStr.split(elementListSplit).map((el) => el.trim())
+    if (elemStrArray.length === 0) {
+      return []
+    }
 
-    if (elements.length === 1) {
-      return this.parseSingle(elemStr)
-    } else if (elements.length > 1) {
-      for (let i = 0; i < elements.length; i++) {
-        if (elements[i].includes('+')) {
-          elements[i] = elements[i].split('+')
-        }
+    if (Array.isArray(elemStrArray[0])) {
+      throw new Error('Not supported, handle this');
+    }
+
+    if (typeof elemStrArray === 'string') {
+      return this.parseSingle(elemStrArray)
+    }
+
+    const elements = elemStrArray.reduceRight((children, current, i, arr) => {
+      if (Array.isArray(current)) {
+        return current.map((c) => this.buildLevel(c, children))
+      } else {
+        return i === 0 ? this.buildLevel(current, children) : [this.buildLevel(current, children)]
       }
+    }, [])
 
-      return elements.reduce((tree, currentElement) => {
-        if (tree) {
-          // Find the deepest (by depth), and then furthest to the 'right' if there are siblings
-          let deepestElement = tree
-          while (deepestElement.children.length) {
-            deepestElement = deepestElement.children[deepestElement.children.length - 1]
-          }
+    return elements
+  }
 
-          if (!Array.isArray(currentElement)) {
-            deepestElement.children.push(this.parseSingle(currentElement))
-          } else {
-            currentElement.forEach((childInSiblingGroup) =>
-              deepestElement.children.push(this.parseSingle(childInSiblingGroup))
-            )
-          }
-          return tree
-        }
-
-        return this.parseSingle(currentElement)
-      }, null)
+  static buildLevel(elemStr, children) {
+    if (!Array.isArray(children)) {
+      throw new Error('buildLevel: `children` must be an Array!')
+    }
+    return {
+      ...this.parseSingle(elemStr),
+      children,
     }
   }
 

@@ -47,7 +47,7 @@ test('does not include invalid attributes in the output', () => {
 })
 
 test('creates an element with one class and an ID', () => {
-  expect(Parser.parse('a#main-link.my-class')).toEqual({
+  expect(Parser.parse(['a#main-link.my-class'])).toEqual({
     tagName: 'a',
     classes: ['my-class'],
     id: 'main-link',
@@ -57,7 +57,7 @@ test('creates an element with one class and an ID', () => {
 })
 
 test('creates an element with one child', () => {
-  expect(Parser.parse('div>span')).toEqual({
+  expect(Parser.parse(['div', 'span'])).toEqual({
     tagName: 'div',
     classes: [],
     id: undefined,
@@ -75,7 +75,10 @@ test('creates an element with one child', () => {
 })
 
 test('creates an element with two children as siblings', () => {
-  expect(Parser.parse('div>span.child-one+span.child-two')).toEqual({
+  expect(Parser.parse([
+    'div',
+    ['span.child-one', 'span.child-two']
+  ])).toEqual({
     tagName: 'div',
     classes: [],
     id: undefined,
@@ -99,17 +102,17 @@ test('creates an element with two children as siblings', () => {
   })
 })
 
-test('creates an element with a child, which has two siblings as children', () => {
-  expect(Parser.parse('div.grandparent>div.parent>div#my-div+span')).toEqual({
+test.only('creates an element with a child, which has two siblings as children', () => {
+  expect(Parser.parse(['div#grandparent', 'div#parent', ['div#my-div', 'span']])).toEqual({
     tagName: 'div',
-    classes: ['grandparent'],
-    id: undefined,
+    classes: [],
+    id: 'grandparent',
     attributes: [],
     children: [
       {
         tagName: 'div',
-        classes: ['parent'],
-        id: undefined,
+        classes: [],
+        id: 'parent',
         attributes: [],
         children: [
           {
@@ -131,10 +134,6 @@ test('creates an element with a child, which has two siblings as children', () =
     ],
   })
 })
-
-// test('basic sibling', () => {
-//   expect(Parser.parse('a.first+a.second')).toEqual({});
-// });
 
 // test('siblings nested', () => {
 //   expect(Parser.parse('div.parent>a.sibling-link+a.sibling-link')).toEqual({});
