@@ -1,3 +1,4 @@
+import { MiniDOMParser } from './parser';
 
 export class MiniDOMBuilder {
 
@@ -17,12 +18,12 @@ export class MiniDOMBuilder {
     };
   }
 
-  static build(elemStr) {
-    return this.builder(this.construct(MiniDOMParser.parse(elemStr)));
+  static build(...elementStrings) {
+    return this.builder(this.construct(MiniDOMParser.parse(elementStrings)));
   }
 
   static construct(elDef) {
-    let el = doc.createElement(elDef.tagName);
+    let el = document.createElement(elDef.tagName);
 
     if (elDef.id) {
       el.id = elDef.id;
