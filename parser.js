@@ -6,32 +6,37 @@ const attributeMatch = /^\[.+=(?:"|').+(?:"|')\]$/
 
 const isTruthy = (x) => !!x
 
-module.exports = class MiniDOMParser {
-
-  static parse(elemStrArray) {
-    if (!Array.isArray(elemStrArray)) {
+export class MiniDOMParser {
+  static parse(inputArray) {
+    // Start validation
+    if (!Array.isArray(inputArray)) {
       throw new Error('Invalid element string: Empty/missing')
     }
 
-    if (elemStrArray.length === 0) {
+    if (inputArray.length === 0) {
       return []
     }
 
-    if (Array.isArray(elemStrArray[0])) {
-      throw new Error('Not supported, handle this');
+    if (Array.isArray(inputArray[0])) {
+      throw new Error('Top level of element tree must not be an array!')
     }
 
-    if (typeof elemStrArray === 'string') {
-      return this.parseSingle(elemStrArray)
+    // TODO Should we allow this?
+    if (typeof inputArray === 'string') {
+      return this.parseSingle(inputArray)
     }
 
-    const elements = elemStrArray.reduceRight((children, current, i, arr) => {
+    // End validation
+
+    const elements = inputArray.reduceRight((children, current, i, arr) => {
       if (Array.isArray(current)) {
         return current.map((c) => this.buildLevel(c, children))
       } else {
         return i === 0 ? this.buildLevel(current, children) : [this.buildLevel(current, children)]
       }
     }, [])
+
+    console.log('FINAL:', elements)
 
     return elements
   }
@@ -46,7 +51,7 @@ module.exports = class MiniDOMParser {
     }
   }
 
-  static parseSingle(input, children = []) {
+  static parseSingle(input) {
     if (!input) {
       throw new Error('Invalid element string: Empty/missing')
     }
@@ -63,19 +68,18 @@ module.exports = class MiniDOMParser {
     // Discard tag name from parts list
     parts.shift()
 
-    let id = parts.find((p) => p.startsWith('#'))
+    let id = parts.find(this.isId)
     if (id) {
       id = id.substring(1)
     }
 
-    const classes = parts
-      .filter((p) => p.startsWith('.') && p.substring(1).match(classMatch))
-      .map((p) => p.substring(1))
+    const classes = parts.filter((p) => this.isClass(p) && p.substring(1).match(classMatch)).map((p) => p.substring(1))
 
     const attributes = this.parseAttributes(parts)
 
     return {
-      children,
+      // TODO Do children need to be returned during parsing?
+      children: [],
       classes,
       attributes,
       id,
@@ -120,11 +124,11 @@ module.exports = class MiniDOMParser {
     }
   }
 
-  static isClass(divider) {
-    return divider === '.'
+  static isClass(part) {
+    return !!part && part.startsWith('.')
   }
 
-  static isId(divider) {
-    return divider === '#'
+  static isId(part) {
+    return !!part && part.startsWith('#')
   }
 }

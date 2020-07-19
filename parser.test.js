@@ -75,10 +75,7 @@ test('creates an element with one child', () => {
 })
 
 test('creates an element with two children as siblings', () => {
-  expect(Parser.parse([
-    'div',
-    ['span.child-one', 'span.child-two']
-  ])).toEqual({
+  expect(Parser.parse(['div', ['span.child-one', 'span.child-two']])).toEqual({
     tagName: 'div',
     classes: [],
     id: undefined,
@@ -102,7 +99,7 @@ test('creates an element with two children as siblings', () => {
   })
 })
 
-test.only('creates an element with a child, which has two siblings as children', () => {
+test('creates an element with a child, which has two siblings as children', () => {
   expect(Parser.parse(['div#grandparent', 'div#parent', ['div#my-div', 'span']])).toEqual({
     tagName: 'div',
     classes: [],
@@ -135,14 +132,6 @@ test.only('creates an element with a child, which has two siblings as children',
   })
 })
 
-// test('siblings nested', () => {
-//   expect(Parser.parse('div.parent>a.sibling-link+a.sibling-link')).toEqual({});
-// });
-
-// test('sibling with children', () => {
-//   expect(Parser.parse('div>a.sib+a.sib-two>div>span.bottom')).toEqual({});
-// });
-
-// test('sibling with children including sibling', () => {
-//   expect(Parser.parse('div>a.sib+a.sib-two>div>span.bottom+span.bottom-sib')).toEqual({});
-// });
+test('does not allow an array of elements to be the top level of a tree', () => {
+  expect(() => Parser.parse([['div.parent-one', 'div.parent-two'], 'div.child'])).toThrow()
+})

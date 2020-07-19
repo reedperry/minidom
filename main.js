@@ -1,5 +1,7 @@
 'use strict';
 
+import { minidom as md } from './minidom';
+
 const blue = {
   background: 'navy'
 };

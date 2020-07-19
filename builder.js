@@ -1,50 +1,10 @@
 
-module.exports = class MiniDOMBuilder {
+export class MiniDOMBuilder {
 
   static render(elemStr, attrs) {
     const elem = this.build(elemStr).render();
-    if (attrs) {
-      for (let attr in attrs) {
-        elem.setAttribute(attr, attrs[attr]);
-      }
-    }
     return elem;
   }
-
-  static construct(elemDef) {
-    if (Array.isArray(elemDef)) {
-      throw new Error('Not ready for this yet...');
-    }
-
-    let elem = doc.createElement(elemDef.tagName);
-
-    if (elemDef.classes.length) {
-      for (let c of elemDef.classes) {
-        elem.classList.add(c);
-      }
-    }
-
-    if (elemDef.id) {
-      elem.id = elemDef.id;
-    }
-
-    if (elemDef.children) {
-      for (const child of elemDef.children) {
-        elem.appendChild(DOMBuilder.construct(child));
-      }
-    }
-
-    return elem;
-  }
-
-  static build(elemStr) {
-    return this.builder(this.construct(MiniDOMParser.parse(elemStr)));
-  }
-
-  static buildTree(elemDef) {
-
-  }
-
 
   static builder(elem) {
     return {
@@ -55,6 +15,42 @@ module.exports = class MiniDOMBuilder {
       withStyle: DOM.withStyle.bind(DOM, elem),
       withText: DOM.withText.bind(DOM, elem)
     };
+  }
+
+  static build(elemStr) {
+    return this.builder(this.construct(MiniDOMParser.parse(elemStr)));
+  }
+
+  static construct(elDef) {
+    let el = doc.createElement(elDef.tagName);
+
+    if (elDef.id) {
+      el.id = elDef.id;
+    }
+
+    if (elDef.classes.length) {
+      for (let c of elDef.classes) {
+        el.classList.add(c);
+      }
+    }
+
+    if (elDef.attributes) {
+      for (let attr in elDef.attributes) {
+        el.setAttribute(attr, elDef.attributes[attr]);
+      }
+    }
+
+    if (elDef.children) {
+      for (const child of elDef.children) {
+        el.appendChild(DOMBuilder.construct(child));
+      }
+    }
+
+    return el;
+  }
+
+  static buildTree(parentElDef) {
+
   }
 
   static click(elem, cb) {

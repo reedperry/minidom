@@ -1,9 +1,8 @@
-const MiniDOMBuilder = require('./builder');
-const MiniDOMMounter = require('./mounter');
+import { MiniDOMBuilder } from './builder';
+import { MiniDOMMounter } from './mounter';
 
-module.exports = {
-  element: elString => MiniDOMBuilder.construct(elString),
-  elementTree: elString => MiniDOMBuilder.constructTree(elString),
+export const minidom = {
+  create: elString => MiniDOMBuilder.build(elString),
   append: (element, parent) => MiniDOMMounter.append(element, parent),
   replace: (element, parent) => MiniDOMMounter.append(element, parent),
 }

@@ -1,0 +1,1 @@
+export { minidom } from './minidom';

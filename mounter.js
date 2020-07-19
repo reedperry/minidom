@@ -1,4 +1,4 @@
-module.exports = class MiniDOMMounter {
+export class MiniDOMMounter {
   /**
    * Replace the contents of a target element with a child element
    * @param el The element to mount
