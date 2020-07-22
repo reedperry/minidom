@@ -63,13 +63,33 @@ test('parses a tag name with attributes', () => {
   })
 })
 
-// test.todo('parses a tag name with an attribute followed by a class', () => {
-//   MiniDOMParser.parseSingle('a[attr="first"].class-at-end')
-// })
+test('parses a tag name with an attribute followed by a class', () => {
+  expect(MiniDOMParser.parseSingle('span[attr="first"].class-at-end')).toEqual({
+    tagName: 'span',
+    classes: ['class-at-end'],
+    id: undefined,
+    attributes: [{ name: 'attr', value: 'first' }],
+    children: [],
+  })
+})
 
-// test.todo('does not include invalid attributes in the output', () => {
-//   MiniDOMParser.parseSingle('div[style="testing"][aria-label="some content"][role="alert"]["not"=valid].my-class#my-id')
-// })
+test('does not include invalid attributes in the output', () => {
+  expect(
+    MiniDOMParser.parseSingle(
+      'div[style="testing"][aria-label="some content"][role="alert"]["not"=valid].my-class#my-id'
+    )
+  ).toEqual({
+    tagName: 'div',
+    classes: ['my-class'],
+    id: 'my-id',
+    attributes: [
+      { name: 'style', value: 'testing' },
+      { name: 'aria-label', value: 'some content' },
+      { name: 'role', value: 'alert' },
+    ],
+    children: [],
+  })
+})
 
 test('creates an element with one class and an ID', () => {
   expect(MiniDOMParser.parseSingle('a#main-link.my-class')).toEqual({
@@ -80,87 +100,3 @@ test('creates an element with one class and an ID', () => {
     children: [],
   })
 })
-
-// Probably removing multiple-element-parsing API...
-
-// test('creates an element with one child', () => {
-//   expect(MiniDOMParser.parse(['div', 'span'])).toEqual({
-//     tagName: 'div',
-//     classes: [],
-//     id: undefined,
-//     attributes: [],
-//     children: [
-//       {
-//         tagName: 'span',
-//         classes: [],
-//         id: undefined,
-//         attributes: [],
-//         children: [],
-//       },
-//     ],
-//   })
-// })
-
-// test('creates an element with two children as siblings', () => {
-//   expect(MiniDOMParser.parse(['div', ['span.child-one', 'span.child-two']])).toEqual({
-//     tagName: 'div',
-//     classes: [],
-//     id: undefined,
-//     attributes: [],
-//     children: [
-//       {
-//         tagName: 'span',
-//         classes: ['child-one'],
-//         id: undefined,
-//         attributes: [],
-//         children: [],
-//       },
-//       {
-//         tagName: 'span',
-//         classes: ['child-two'],
-//         id: undefined,
-//         attributes: [],
-//         children: [],
-//       },
-//     ],
-//   })
-// })
-
-// test('creates an element with a child, which has two siblings as children', () => {
-//   expect(MiniDOMParser.parse(['div#grandparent', 'div#parent', ['div#my-div', 'span']])).toEqual({
-//     tagName: 'div',
-//     classes: [],
-//     id: 'grandparent',
-//     attributes: [],
-//     children: [
-//       {
-//         tagName: 'div',
-//         classes: [],
-//         id: 'parent',
-//         attributes: [],
-//         children: [
-//           {
-//             tagName: 'div',
-//             classes: [],
-//             id: 'my-div',
-//             attributes: [],
-//             children: [],
-//           },
-//           {
-//             tagName: 'span',
-//             classes: [],
-//             id: undefined,
-//             attributes: [],
-//             children: [],
-//           },
-//         ],
-//       },
-//     ],
-//   })
-// })
-
-// test('does not allow an array of elements to be the top level of a tree', () => {
-//   expect(() => MiniDOMParser.parse([['div.parent-one', 'div.parent-two'], 'div.child'])).toThrow()
-// })
-
-// End questionable API...

@@ -99,14 +99,14 @@ export class MiniDOMParser {
 
   static parseAttribute(attrString) {
     if (!attrString) {
-      if (__DEV__) {
+      if (process.env.NODE_ENV !== 'production') {
         console.warn('No attribute string passed to parseAttribute')
       }
       return null
     }
 
     if (!attrString.match(attributeMatch)) {
-      if (__DEV__) {
+      if (process.env.NODE_ENV !== 'production') {
         console.warn(`Invalid attribute string passed to parseAttribute: ${attrString}`)
       }
       return null
