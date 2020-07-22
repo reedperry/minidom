@@ -19,7 +19,8 @@ export class MiniDOMBuilder {
     };
   }
 
-  static build(elementString) {
+  static build(elementString, ...children) {
+    // TODO Pass children down
     return this.builder(this.construct(MiniDOMParser.parseSingle(elementString)));
   }
 
