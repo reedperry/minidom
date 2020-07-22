@@ -2,12 +2,13 @@ import { MiniDOMParser } from './parser';
 
 export class MiniDOMBuilder {
 
-  static render(elemStr, attrs) {
+  static render(elemStr) {
     const elem = this.build(elemStr).render();
     return elem;
   }
 
   static builder(element) {
+
     return {
       render: () => element,
       click: MiniDOMBuilder.click.bind(MiniDOMBuilder, element),
@@ -23,6 +24,7 @@ export class MiniDOMBuilder {
   }
 
   static construct(elDef) {
+
     let el = document.createElement(elDef.tagName);
 
     if (elDef.id) {
@@ -36,8 +38,8 @@ export class MiniDOMBuilder {
     }
 
     if (elDef.attributes) {
-      for (let attr in elDef.attributes) {
-        el.setAttribute(attr, elDef.attributes[attr]);
+      for (let attr of elDef.attributes) {
+        el.setAttribute(attr.name, elDef.attributes[attr.value]);
       }
     }
 

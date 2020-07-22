@@ -36,8 +36,6 @@ export class MiniDOMParser {
       }
     }, [])
 
-    console.log('FINAL:', elements)
-
     return elements
   }
 
@@ -78,7 +76,6 @@ export class MiniDOMParser {
     const attributes = this.parseAttributes(parts)
 
     return {
-      // TODO Do children need to be returned during parsing?
       children: [],
       classes,
       attributes,
@@ -102,10 +99,16 @@ export class MiniDOMParser {
 
   static parseAttribute(attrString) {
     if (!attrString) {
+      if (__DEV__) {
+        console.warn('No attribute string passed to parseAttribute')
+      }
       return null
     }
 
     if (!attrString.match(attributeMatch)) {
+      if (__DEV__) {
+        console.warn(`Invalid attribute string passed to parseAttribute: ${attrString}`)
+      }
       return null
     }
 
