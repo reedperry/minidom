@@ -7,47 +7,6 @@ const attributeMatch = /^\[.+=(?:"|').+(?:"|')\]$/
 const isTruthy = (x) => !!x
 
 export class MiniDOMParser {
-  static parse(inputArray) {
-    // Start validation
-    if (!Array.isArray(inputArray)) {
-      throw new Error('Invalid element string: Empty/missing')
-    }
-
-    if (inputArray.length === 0) {
-      return []
-    }
-
-    if (Array.isArray(inputArray[0])) {
-      throw new Error('Top level of element tree must not be an array!')
-    }
-
-    // TODO Should we allow this?
-    if (typeof inputArray === 'string') {
-      return this.parseSingle(inputArray)
-    }
-
-    // End validation
-
-    const elements = inputArray.reduceRight((children, current, i, arr) => {
-      if (Array.isArray(current)) {
-        return current.map((c) => this.buildLevel(c, children))
-      } else {
-        return i === 0 ? this.buildLevel(current, children) : [this.buildLevel(current, children)]
-      }
-    }, [])
-
-    return elements
-  }
-
-  static buildLevel(elemStr, children) {
-    if (!Array.isArray(children)) {
-      throw new Error('buildLevel: `children` must be an Array!')
-    }
-    return {
-      ...this.parseSingle(elemStr),
-      children,
-    }
-  }
 
   static parseSingle(input) {
     if (!input) {
