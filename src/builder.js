@@ -1,28 +1,13 @@
 import { MiniDOMParser } from './parser'
 
 export class MiniDOMBuilder {
-  static render(elemStr) {
-    const elem = this.build(elemStr).render()
-    return elem
+  static build(elementString, children) {
+    const parsedElement = MiniDOMParser.parse(elementString)
+    const constructedElement = this.construct(parsedElement, children)
+    return this.builder(constructedElement)
   }
 
-  static builder(element) {
-    return {
-      render: () => element,
-      click: MiniDOMBuilder.click.bind(MiniDOMBuilder, element),
-      on: MiniDOMBuilder.on.bind(MiniDOMBuilder, element),
-      withAttrs: MiniDOMBuilder.withAttrs.bind(MiniDOMBuilder, element),
-      withStyle: MiniDOMBuilder.withStyle.bind(MiniDOMBuilder, element),
-      withText: MiniDOMBuilder.withText.bind(MiniDOMBuilder, element),
-    }
-  }
-
-  static build(elementString, ...children) {
-    // TODO Pass children down
-    return this.builder(this.construct(MiniDOMParser.parseSingle(elementString)))
-  }
-
-  static construct(elDef) {
+  static construct(elDef, children) {
     let el = document.createElement(elDef.tagName)
 
     if (elDef.id) {
@@ -41,49 +26,54 @@ export class MiniDOMBuilder {
       }
     }
 
-    if (elDef.children) {
-      for (const child of elDef.children) {
-        el.appendChild(MiniDOMBuilder.construct(child))
+    let currentLevel = el
+    let appendedLevel
+
+    for (const child of children) {
+      if (Array.isArray(currentLevel)) {
+        if (Array.isArray(child)) {
+          appendedLevel = []
+          currentLevel.forEach((siblingEl) => {
+            child.forEach((c) => {
+              appendedLevel.push(siblingEl.appendChild(c.cloneNode()))
+            })
+          })
+        } else {
+          appendedLevel = []
+          currentLevel.forEach((siblingEl) => {
+            appendedLevel.push(siblingEl.appendChild(child.cloneNode()))
+          })
+        }
+      } else {
+        if (Array.isArray(child)) {
+          appendedLevel = []
+          child.forEach((c) => {
+            appendedLevel.push(currentLevel.appendChild(c.cloneNode()))
+          })
+        } else {
+          appendedLevel = currentLevel.appendChild(child)
+        }
       }
+
+      currentLevel = appendedLevel
     }
 
     return el
   }
 
-  static buildTree(inputArray) {
-    // Start validation - refactor
-    if (!Array.isArray(inputArray)) {
-      throw new Error('Invalid element string: Empty/missing')
-    }
-
-    if (inputArray.length === 0) {
-      return []
-    }
-
-    // Won't happen, right?
-    if (Array.isArray(inputArray[0])) {
-      throw new Error('Top level of element tree must not be an array!')
-    }
-    // End validation
-
-    const elements = inputArray.reduceRight((children, currentLevel, i, arr) => {
-      if (Array.isArray(currentLevel)) {
-        return currentLevel.map((c) => this.buildLevel(c, children))
-      } else {
-        return i === 0 ? this.buildLevel(currentLevel, children) : [this.buildLevel(currentLevel, children)]
-      }
-    }, [])
-
-    return elements
+  static render(elemStr) {
+    const elem = this.build(elemStr).render()
+    return elem
   }
 
-  static buildLevel(elemDef, children) {
-    if (!Array.isArray(children)) {
-      throw new Error('buildLevel: `children` must be an Array!')
-    }
+  static builder(element) {
     return {
-      ...elemDef,
-      children,
+      render: () => element,
+      click: MiniDOMBuilder.click.bind(MiniDOMBuilder, element),
+      on: MiniDOMBuilder.on.bind(MiniDOMBuilder, element),
+      withAttrs: MiniDOMBuilder.withAttrs.bind(MiniDOMBuilder, element),
+      withStyle: MiniDOMBuilder.withStyle.bind(MiniDOMBuilder, element),
+      withText: MiniDOMBuilder.withText.bind(MiniDOMBuilder, element),
     }
   }
 

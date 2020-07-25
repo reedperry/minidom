@@ -1,18 +1,18 @@
 import { MiniDOMParser } from './parser'
 
 test('element tag name including dashes', () => {
-  expect(MiniDOMParser.parseSingle('my-custom-element').tagName).toBe('my-custom-element')
+  expect(MiniDOMParser.parse('my-custom-element').tagName).toBe('my-custom-element')
 })
 
 test('element tag name including dashes and an ID', () => {
-  const result = MiniDOMParser.parseSingle('my-custom-element#my-id')
+  const result = MiniDOMParser.parse('my-custom-element#my-id')
 
   expect(result.tagName).toBe('my-custom-element')
   expect(result.id).toBe('my-id')
 })
 
 test('single character element tag name', () => {
-  const result = MiniDOMParser.parseSingle('a')
+  const result = MiniDOMParser.parse('a')
 
   expect(result.tagName).toBe('a')
   expect(result.id).toBeUndefined()
@@ -20,18 +20,18 @@ test('single character element tag name', () => {
 
 test('does not accept an element tag name ending in a dash', () => {
   expect(() => {
-    MiniDOMParser.parseSingle('a-')
+    MiniDOMParser.parse('a-')
   }).toThrow(new Error('Invalid element string: Must start with tag name'))
 })
 
 test('does not accept an element tag name ending in a dash followed by a class', () => {
   expect(() => {
-    MiniDOMParser.parseSingle('a-.this-is-not-cool')
+    MiniDOMParser.parse('a-.this-is-not-cool')
   }).toThrow(new Error('Invalid element string: Must start with tag name'))
 })
 
 test('parses a tag name followed by two classes', () => {
-  expect(MiniDOMParser.parseSingle('a.my-class.other-class')).toEqual({
+  expect(MiniDOMParser.parse('a.my-class.other-class')).toEqual({
     tagName: 'a',
     classes: ['my-class', 'other-class'],
     id: undefined,
@@ -41,7 +41,7 @@ test('parses a tag name followed by two classes', () => {
 })
 
 test('parses a tag name with a class followed by an attribute', () => {
-  expect(MiniDOMParser.parseSingle('div.my-class[style="testing"]')).toEqual({
+  expect(MiniDOMParser.parse('div.my-class[style="testing"]')).toEqual({
     tagName: 'div',
     classes: ['my-class'],
     id: undefined,
@@ -51,7 +51,7 @@ test('parses a tag name with a class followed by an attribute', () => {
 })
 
 test('parses a tag name with attributes', () => {
-  expect(MiniDOMParser.parseSingle('p[role="test-role"][attr="value"]')).toEqual({
+  expect(MiniDOMParser.parse('p[role="test-role"][attr="value"]')).toEqual({
     tagName: 'p',
     classes: [],
     id: undefined,
@@ -64,7 +64,7 @@ test('parses a tag name with attributes', () => {
 })
 
 test('parses a tag name with an attribute followed by a class', () => {
-  expect(MiniDOMParser.parseSingle('span[attr="first"].class-at-end')).toEqual({
+  expect(MiniDOMParser.parse('span[attr="first"].class-at-end')).toEqual({
     tagName: 'span',
     classes: ['class-at-end'],
     id: undefined,
@@ -75,7 +75,7 @@ test('parses a tag name with an attribute followed by a class', () => {
 
 test('does not include invalid attributes in the output', () => {
   expect(
-    MiniDOMParser.parseSingle(
+    MiniDOMParser.parse(
       'div[style="testing"][aria-label="some content"][role="alert"]["not"=valid].my-class#my-id'
     )
   ).toEqual({
@@ -92,7 +92,7 @@ test('does not include invalid attributes in the output', () => {
 })
 
 test('creates an element with one class and an ID', () => {
-  expect(MiniDOMParser.parseSingle('a#main-link.my-class')).toEqual({
+  expect(MiniDOMParser.parse('a#main-link.my-class')).toEqual({
     tagName: 'a',
     classes: ['my-class'],
     id: 'main-link',

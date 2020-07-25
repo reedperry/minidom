@@ -8,7 +8,7 @@ const isTruthy = (x) => !!x
 
 export class MiniDOMParser {
 
-  static parseSingle(input) {
+  static parse(input) {
     if (!input) {
       throw new Error('Invalid element string: Empty/missing')
     }
