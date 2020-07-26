@@ -1,69 +1,64 @@
 import { MiniDOMParser } from './parser'
 
 export class MiniDOMBuilder {
-  static build(elementString, children) {
+  static build(elementString, children = []) {
     const parsedElement = MiniDOMParser.parse(elementString)
     const constructedElement = this.construct(parsedElement, children)
     return this.builder(constructedElement)
   }
 
-  static construct(elDef, children) {
-    let el = document.createElement(elDef.tagName)
-
-    if (elDef.id) {
-      el.id = elDef.id
-    }
-
-    if (elDef.classes.length) {
-      for (let c of elDef.classes) {
-        el.classList.add(c)
-      }
-    }
-
-    if (elDef.attributes) {
-      for (let attr of elDef.attributes) {
-        el.setAttribute(attr.name, elDef.attributes[attr.value])
-      }
-    }
-
-    let currentLevel = el
-    let appendedLevel
-
-    for (const child of children) {
-      if (Array.isArray(currentLevel)) {
-        if (Array.isArray(child)) {
-          appendedLevel = []
-          currentLevel.forEach((siblingEl) => {
-            child.forEach((c) => {
-              appendedLevel.push(siblingEl.appendChild(c.cloneNode()))
-            })
-          })
-        } else {
-          appendedLevel = []
-          currentLevel.forEach((siblingEl) => {
-            appendedLevel.push(siblingEl.appendChild(child.cloneNode()))
-          })
-        }
-      } else {
-        if (Array.isArray(child)) {
-          appendedLevel = []
-          child.forEach((c) => {
-            appendedLevel.push(currentLevel.appendChild(c.cloneNode()))
-          })
-        } else {
-          appendedLevel = currentLevel.appendChild(child)
-        }
-      }
-
-      currentLevel = appendedLevel
-    }
-
-    return el
+  static render(elemStr, children) {
+    const elem = this.build(elemStr, children).render()
+    return elem
   }
 
-  static render(elemStr) {
-    const elem = this.build(elemStr).render()
-    return elem
+  static construct(elementDefinition, children = []) {
+    let element = document.createElement(elementDefinition.tagName)
+
+    this.addId(elementDefinition, element)
+    this.addClasses(elementDefinition, element)
+    this.addAttributes(elementDefinition, element)
+
+    let currentLevel = element
+
+    for (const child of children) {
+      currentLevel = this.buildLevel(currentLevel, child)
+    }
+
+    return element
+  }
+
+  static buildLevel(currentLevel, child) {
+    if (this.doesLevelContainSiblings(currentLevel)) {
+      return this.appendChildrenToAllParents(currentLevel, child)
+    } else {
+      return this.appendChildrenToParent(currentLevel, child)
+    }
+  }
+
+  static appendChildrenToAllParents(parents, children) {
+    if (this.doesLevelContainSiblings(children)) {
+      let newLevel = []
+      for (const parent of parents) {
+        newLevel = newLevel.concat(this.appendChildrenToParent(parent, children))
+      }
+      return newLevel
+
+      // With better variable naming, could this be more readable than the for loop?
+      // return parents.reduce((newLevel, parent) => {
+      //   return newLevel.concat(this.appendChildrenToParent(parent, children))
+      // }, [])
+    } else {
+      return parents.map((parent) => parent.appendChild(children.cloneNode()))
+    }
+  }
+
+  static appendChildrenToParent(parent, children) {
+    if (this.doesLevelContainSiblings(children)) {
+      return children.map((c) => parent.appendChild(c.cloneNode()))
+    } else {
+      return parent.appendChild(children)
+    }
   }
 
   static builder(element) {
@@ -74,6 +69,28 @@ export class MiniDOMBuilder {
       withAttrs: MiniDOMBuilder.withAttrs.bind(MiniDOMBuilder, element),
       withStyle: MiniDOMBuilder.withStyle.bind(MiniDOMBuilder, element),
       withText: MiniDOMBuilder.withText.bind(MiniDOMBuilder, element),
+    }
+  }
+
+  static addId(elDef, el) {
+    if (elDef.id) {
+      el.id = elDef.id
+    }
+  }
+
+  static addClasses(elDef, el) {
+    if (elDef.classes.length) {
+      for (let c of elDef.classes) {
+        el.classList.add(c)
+      }
+    }
+  }
+
+  static addAttributes(elDef, el) {
+    if (elDef.attributes) {
+      for (let attr of elDef.attributes) {
+        el.setAttribute(attr.name, elDef.attributes[attr.value])
+      }
     }
   }
 
@@ -100,5 +117,9 @@ export class MiniDOMBuilder {
   static withText(elem, text) {
     elem.textContent = text
     return MiniDOMBuilder.builder(elem)
+  }
+
+  static doesLevelContainSiblings(level) {
+    return Array.isArray(level)
   }
 }
