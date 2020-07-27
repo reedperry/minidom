@@ -1,8 +1,8 @@
-import { MiniDOMParser } from './parser'
+import { parse } from './parser'
 
 export class MiniDOMBuilder {
   static build(elementString, children = []) {
-    const parsedElement = MiniDOMParser.parse(elementString)
+    const parsedElement = parse(elementString)
     const constructedElement = this.construct(parsedElement, children)
     return this.builder(constructedElement)
   }
