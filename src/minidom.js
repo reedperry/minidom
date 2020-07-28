@@ -1,13 +1,13 @@
-import { MiniDOMBuilder } from './builder'
-import { append, replace } from './mounter'
+import { create, render } from './builder'
+import { append, mount } from './mounter'
 
 export const minidom = {
   create: (elString, ...children) => {
-    return MiniDOMBuilder.render(elString, children)
+    return create(elString, children)
   },
   build: (elString, ...children) => {
-    return MiniDOMBuilder.build(elString, children)
+    return build(elString, children)
   },
   append: (element, parent) => append(element, parent),
-  replace: (element, parent) => replace(element, parent),
+  mount: (element, parent) => mount(element, parent),
 }
