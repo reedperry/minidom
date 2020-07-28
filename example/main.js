@@ -1,6 +1,6 @@
 'use strict';
 
-import { minidom as md } from './minidom';
+//import { minidom as md } from '../minidom';
 
 const blue = {
   background: 'navy'
@@ -42,9 +42,9 @@ const square = {
   padding: 0
 };
 
-const app = DOM.render('div#app');
+const app = md.create('div#app');
 
-const header = DOM.build('div.header')
+const header = md.build('div.header')
   .withStyle({ backgroundColor: 'lightgray' })
   .render();
 
@@ -59,28 +59,28 @@ const linkStyle = {
 };
 
 const links = ['Home', 'About', 'Archive'].map(function(text) {
-  const linkContainer = DOM.build('div.link').withStyle(linkStyle).render();
-  DOM.mount(
-    DOM.build('a').withText(text).withAttrs(attrs).render(),
+  const linkContainer = md.build('div.link').withStyle(linkStyle).render();
+  md.append(
+    md.build('a').withText(text).withAttrs(attrs).render(),
     linkContainer
   );
   return linkContainer;
 });
 
 links.forEach(function(link) {
-  DOM.mount(link, header);
+  md.append(link, header);
 });
 
-DOM.mount(header, app);
+md.append(header, app);
 
 const spaced = {
   margin: '5px'
 };
 
-const container = DOM.render('div#container');
+const container = md.create('div#container');
 const colors = [blue, green, red, yellow, gray];
 for (let i = 0; i < 5; i++) {
-  const box = DOM.build('div')
+  const box = md.build('div')
     .withStyle(colors[i])
     .withStyle(square)
     .withStyle(spaced)
@@ -92,15 +92,15 @@ for (let i = 0; i < 5; i++) {
     })
     .render();
 
-  DOM.mount(box, container);
+  md.append(box, container);
 }
 
-DOM.mount(container, app);
+md.append(container, app);
 
 // const els = []
 // for (let i = 0; i < 40; i++) {
 //   els.push(
-//     DOM.build('div.disco')
+//     md.build('div.disco')
 //       .withStyle(square)
 //       .withStyle(transition)
 //       .withStyle(red)
@@ -110,7 +110,7 @@ DOM.mount(container, app);
 // }
 // els.forEach(el => app.appendChild(el))
 
-DOM.mount(app);
+md.mount(app, document.body);
 
 // const styles = [red, blue, green, yellow, gray]
 

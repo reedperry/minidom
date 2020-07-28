@@ -8,7 +8,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "webpack",
+    "build": "webpack && node ./scripts/copyBuildToExample.js",
     "test": "jest"
   },
   "devDependencies": {
