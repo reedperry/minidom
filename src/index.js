@@ -1,7 +1,3 @@
-import { minidom } from './minidom';
-import * as timeUtils from './timeUtils';
-window.md = minidom;
-window.timeUtils = timeUtils;
-
-// export { minidom } from './minidom';
-// export { afterMs, afterSeconds, everyMs, everySeconds } from './timeUtils';
+export  { build, create } from './builder'
+export  { append, mount } from './mounter'
+export { afterMs, afterSeconds, everyMs, everySeconds } from './timeUtils';

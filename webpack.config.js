@@ -1,7 +1,9 @@
 module.exports = {
   mode: 'development',
   output: {
-    filename: 'bundle.js',
+    library: 'md',
+    libraryTarget: 'umd',
+    filename: 'minidom.js',
   },
   module: {
     rules: [

@@ -6,7 +6,7 @@ export function build(elementString, children = []) {
   return builder(constructedElement)
 }
 
-export function render(elemStr, children) {
+export function create(elemStr, ...children) {
   const elem = build(elemStr, children).render()
   return elem
 }
@@ -39,15 +39,10 @@ function buildLevel(currentLevel, child) {
 function appendChildrenToAllParents(parents, children) {
   if (doesLevelContainSiblings(children)) {
     let newLevel = []
-    for (const parent of parents) {
+    parents.forEach(parent => {
       newLevel = newLevel.concat(appendChildrenToParent(parent, children))
-    }
+    })
     return newLevel
-
-    // With better variable naming, could this be more readable than the for loop?
-    // return parents.reduce((newLevel, parent) => {
-    //   return newLevel.concat(appendChildrenToParent(parent, children))
-    // }, [])
   } else {
     return parents.map((parent) => parent.appendChild(children.cloneNode()))
   }
@@ -64,7 +59,6 @@ function appendChildrenToParent(parent, children) {
 function builder(element) {
   return {
     render: () => element,
-    // TODO Do we still need bindings at all?
     click: click.bind(null, element),
     on: on.bind(null, element),
     withAttrs: withAttrs.bind(null, element),

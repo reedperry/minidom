@@ -17,21 +17,10 @@ const gray = {
 }
 
 const transition = {
-  transition: 'background-color .25s ease-in',
-  '-webkit-transition': 'background-color .25s ease-in',
+  transition: 'background-color 0.75s',
+  '-webkit-transition': 'background-color 0.75s',
 }
-const tall = {
-  height: '200px',
-  width: '100px',
-  display: 'inline-block',
-  margin: '2px',
-}
-const wide = {
-  height: '100px',
-  width: '200px',
-  display: 'inline-block',
-  margin: '2px',
-}
+
 const square = {
   height: '150px',
   width: '150px',
@@ -41,8 +30,8 @@ const square = {
 }
 
 const smallSquare = {
-  height: '30px',
-  width: '30px',
+  height: '20px',
+  width: '20px',
   display: 'inline-block',
   margin: 0,
   padding: 0,
@@ -125,7 +114,7 @@ md.mount(app, document.body)
 
 const styles = [red, blue, green, yellow, gray]
 
-let intervalId = timeUtils.everyMs(250, (i) => {
+let intervalId = md.everyMs(1000, (i) => {
   const divs = document.querySelectorAll('div.disco')
   for (let d of divs) {
     Object.assign(d.style, styles[Math.floor(Math.random() * styles.length)], transition)
