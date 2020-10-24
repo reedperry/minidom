@@ -20,8 +20,6 @@ export function parse(input) {
   const attributes = parseAttributes(parts)
 
   return {
-    // Can we remove this?
-    children: [],
     tagName,
     id,
     classes,
@@ -33,7 +31,6 @@ function parseTagName(inputParts) {
   const tagName = inputParts[0] || null
   const tagNameMatch = !!tagName && tagName.match(validTagName)
   if (!tagNameMatch || tagNameMatch.index !== 0) {
-    // TODO Define better error
     throw new Error('Invalid element string: Must start with tag name')
   }
   return tagName
@@ -70,17 +67,7 @@ function parseAttributes(inputParts) {
 }
 
 function parseAttribute(attrString) {
-  if (!attrString) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('No attribute string passed to parseAttribute')
-    }
-    return null
-  }
-
-  if (!attrString.match(attributeMatch)) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(`Invalid attribute string passed to parseAttribute: ${attrString}`)
-    }
+  if (!attrString || !attrString.match(attributeMatch)) {
     return null
   }
 

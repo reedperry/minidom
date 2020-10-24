@@ -36,7 +36,6 @@ test('parses a tag name followed by two classes', () => {
     classes: ['my-class', 'other-class'],
     id: undefined,
     attributes: [],
-    children: [],
   })
 })
 
@@ -46,7 +45,6 @@ test('parses a tag name with a class followed by an attribute', () => {
     classes: ['my-class'],
     id: undefined,
     attributes: [{ name: 'style', value: 'testing' }],
-    children: [],
   })
 })
 
@@ -59,7 +57,6 @@ test('parses a tag name with attributes', () => {
       { name: 'role', value: 'test-role' },
       { name: 'attr', value: 'value' },
     ],
-    children: [],
   })
 })
 
@@ -69,16 +66,11 @@ test('parses a tag name with an attribute followed by a class', () => {
     classes: ['class-at-end'],
     id: undefined,
     attributes: [{ name: 'attr', value: 'first' }],
-    children: [],
   })
 })
 
 test('does not include invalid attributes in the output', () => {
-  expect(
-    parse(
-      'div[style="testing"][aria-label="some content"][role="alert"]["not"=valid].my-class#my-id'
-    )
-  ).toEqual({
+  expect(parse('div[style="testing"][aria-label="some content"][role="alert"]["not"=valid].my-class#my-id')).toEqual({
     tagName: 'div',
     classes: ['my-class'],
     id: 'my-id',
@@ -87,7 +79,6 @@ test('does not include invalid attributes in the output', () => {
       { name: 'aria-label', value: 'some content' },
       { name: 'role', value: 'alert' },
     ],
-    children: [],
   })
 })
 
@@ -97,6 +88,5 @@ test('creates an element with one class and an ID', () => {
     classes: ['my-class'],
     id: 'main-link',
     attributes: [],
-    children: [],
   })
 })

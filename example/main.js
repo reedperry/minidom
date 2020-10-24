@@ -37,7 +37,7 @@ const smallSquare = {
   padding: 0,
 }
 
-const app = md.create('div#app')
+const app = md.elem('div#app')
 
 const header = md.build('div.header').withStyle({ backgroundColor: '#ddd' }).render()
 
@@ -83,7 +83,7 @@ const spaced = {
   margin: '10px',
 }
 
-const container = md.create('div#container')
+const container = md.elem('div#container')
 const colors = [blue, green, red, yellow, gray]
 for (let i = 0; i < 5; i++) {
   const box = md

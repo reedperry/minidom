@@ -6,7 +6,7 @@ export function build(elementString, children = []) {
   return builder(constructedElement)
 }
 
-export function create(elemStr, ...children) {
+export function elem(elemStr, ...children) {
   const elem = build(elemStr, children).render()
   return elem
 }
@@ -28,8 +28,7 @@ function construct(elementDefinition, children = []) {
 }
 
 function buildLevel(currentLevel, child) {
-  // TODO Rename
-  if (doesLevelContainSiblings(currentLevel)) {
+  if (areSiblingsPresent(currentLevel)) {
     return appendChildrenToAllParents(currentLevel, child)
   } else {
     return appendChildrenToParent(currentLevel, child)
@@ -37,7 +36,7 @@ function buildLevel(currentLevel, child) {
 }
 
 function appendChildrenToAllParents(parents, children) {
-  if (doesLevelContainSiblings(children)) {
+  if (areSiblingsPresent(children)) {
     let newLevel = []
     parents.forEach(parent => {
       newLevel = newLevel.concat(appendChildrenToParent(parent, children))
@@ -49,7 +48,7 @@ function appendChildrenToAllParents(parents, children) {
 }
 
 function appendChildrenToParent(parent, children) {
-  if (doesLevelContainSiblings(children)) {
+  if (areSiblingsPresent(children)) {
     return children.map((c) => parent.appendChild(c.cloneNode()))
   } else {
     return parent.appendChild(children)
@@ -114,6 +113,6 @@ function withText(elem, text) {
   return builder(elem)
 }
 
-function doesLevelContainSiblings(level) {
+function areSiblingsPresent(level) {
   return Array.isArray(level)
 }

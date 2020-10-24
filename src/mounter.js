@@ -16,12 +16,8 @@ export function mount(el, target) {
  */
 export function append(el, target) {
   if (Array.isArray(el)) {
-    // TODO Verify that there's no valid case where this would happen
     throw new Error('Cannot append multiple elements to a target element!')
-    el.forEach((e) => {
-      target.appendChild(e)
-    })
-  } else {
-    target.appendChild(el)
-  }
+  } 
+  
+  target.appendChild(el)
 }
