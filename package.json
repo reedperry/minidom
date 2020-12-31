@@ -1,0 +1,30 @@
+{
+  "name": "minidom",
+  "version": "1.0.0",
+  "description": "A simple library for creating and adding DOM elements to a page.",
+  "main": "index.js",
+  "repository": "https://github.com/reedperry/minidom.git",
+  "author": "Reed Perry <reedperry@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "webpack && node ./scripts/copyBuildToExample.js",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "babel-loader": "^8.1.0",
+    "jest": "^26.1.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "moduleDirectories": [
+      "node_modules"
+    ]
+  }
+}
